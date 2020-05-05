@@ -1,5 +1,6 @@
 const express = require('express');
-const databaseRouter = require('./data/db-router') //for the routing not sure if its posts yet.
+const postsRouter = require('./posts/postsRouter.js');
+//const commentRouter = require('./posts/commentRouter.js'); //for the routing not sure if its posts yet.
 const server = express();
 
 server.use(express.json());
@@ -12,7 +13,8 @@ server.get('/', (req, res)=>{
     `)
 })
 
-server.use('/api/posts', databaseRouter);
+server.use('/api/posts', postsRouter);
+
 server.listen(5000, ()=>{
     console.log('\n*** Server running on http://localhost:5000***\n')
 })

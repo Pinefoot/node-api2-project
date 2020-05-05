@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const Database = require('./db.js');
+const Posts = require('../data/db.js');
 
 router.get('/', (req,res)=>{
-    Database.find(req.query)
+    Posts.find(req.query)
     .then(data =>{
         res.status(200).json(data);
     }).catch(error =>{
@@ -14,10 +14,11 @@ router.get('/', (req,res)=>{
 })
 
 router.get('/:id', (req,res)=>{
-    Database.findById(req.params.id)
+    Posts.findById(req.params.id)
     .then(data =>{
-        if(data){
+        if(!data.id){
             res.status(200).json(data)
+            
         }else{
             res.status(404).json({message: 'Post data not found!'})
         }
@@ -25,7 +26,7 @@ router.get('/:id', (req,res)=>{
 })
 
 router.post('/', (req, res) =>{
-    Database.add(req.body)
+    Posts.insert(req.body)
     .then(data =>{
         res.status(201).json(data);
     }).catch(error =>{
@@ -35,6 +36,24 @@ router.post('/', (req, res) =>{
         })
     })
 })
+
+router.delete('/:id', (req, res)=>{
+    Posts.remove(req.params.id)
+    .then(data =>{
+        if(data > 0){
+            res.status(200).json({message: 'This post has been deleted'})
+        }else{
+            res.status(404).json({message: 'This post could not be found!'})
+        }
+    })
+})
+
+
+
+
+// /api/posts/:id   
+//| Removes the post with the specified id and returns the **deleted post object**. 
+//You may need to make additional calls to the database in order to satisfy this requirement. |
 
 
 
