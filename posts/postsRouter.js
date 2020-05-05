@@ -70,14 +70,17 @@ router.delete('/:id', (req, res)=>{
 
 router.put('/:id', (req, res)=>{
     const changes = req.body
-    
+    if(!req.body.title || !req.body.contents){
+       return res.status(400).json({message: 'The error is the error that i need to update to be the correct error.'})
+}
 
     Posts.update(req.params.id, changes)
     .then(update =>{
-        if(!req.body.title || !req.body.contents){
-            res.status(404).json({message: 'The error is the error that i need to update to be the correct error.'})
+        console.log(update, "this is the update");
+        if (update === 0){
+        res.status(404).json({message: "The post with the specified ID does not exist "})
+       
     }else{
-        
         res.status(200).json(update)
     }
     }).catch(error =>{
