@@ -22,19 +22,36 @@ router.get('/:id', (req,res)=>{
         }else{
             res.status(404).json({message: 'Post data not found!'})
         }
+    }).catch(err => {
+        res.status(500).json({message: "There was an error while saving to the database"})
     })
 })
 
 router.post('/', (req, res) =>{
-    Posts.insert(req.body)
-    .then(data =>{
-        res.status(201).json(data);
-    }).catch(error =>{
-        console.log(error)
-        res.status(500).json({
-            message: 'Error adding the post data'
+    const {title, contents} = req.body
+    if(!title || !contents){
+        return res.status(400).json({message: 'Please provide title and content!'})
+    }
+    Posts.insert({title,contents})
+    .then(({id})=>{
+        Posts.findById(id)
+        .then(([post]) =>{
+            res.status(201).json(post)
+
+        }).catch(err =>{
+            res.status(500).json({message: 'Error adding the post data'})
         })
     })
+
+    // Posts.insert(req.body)
+    // .then(data =>{
+    //     res.status(201).json(data);
+    // }).catch(error =>{
+    //     console.log(error)
+    //     res.status(500).json({
+    //         message: 'Error adding the post data'
+    //     })
+    // })
 })
 
 router.delete('/:id', (req, res)=>{
@@ -43,19 +60,76 @@ router.delete('/:id', (req, res)=>{
         if(data > 0){
             res.status(200).json({message: 'This post has been deleted'})
         }else{
-            res.status(404).json({message: 'This post could not be found!'})
+            res.status(404).json({message: 'This post with the specified ID does not exist!'})
         }
+    }).catch(err => {
+        res.status(500).json({message: "There was an error while saving to the database"})
+    })
+})
+
+
+router.put('/:id', (req, res)=>{
+    const {title, contents} = req.body
+    if(!title || !contents){
+        return res.status(400).json({message: 'Please provide title and content!'})
+    }
+
+    Posts.update(({title, contents}))
+    .then(({id})=>{
+        Posts.findById(id)
+        .then(([post]))
+        res.status(201).json(post)
+    }).catch(err =>{
+        es.status(500).json({message: 'Error adding the post data'})
     })
 })
 
 
 
 
-// /api/posts/:id   
-//| Removes the post with the specified id and returns the **deleted post object**. 
-//You may need to make additional calls to the database in order to satisfy this requirement. |
 
 
+//comment stuff
+
+router.get('/:id/comments', (req, res) =>{
+    Posts.findCommentById(req.params.id)
+    .then(([data]) =>{
+        if(data){
+            res.status(200).json(data)
+            
+        }else{
+            res.status(404).json({message: 'The post with the specified ID does not exist'})
+        }
+    }).catch(err => {
+        res.status(500).json({message: "There was an error while saving to the database"})
+    })
+
+})
+
+
+
+
+router.post('/:post_id/comments', (req, res) =>{
+    const {post_id} = req.params
+    const {text} = req.body
+    if(text === "" || typeof text != "string" ){
+       return res.status(400).json({message: 'Please provide text for the comment.'})
+    }
+
+    Posts.insertComment({post_id, text})
+    .then(({id: comment_id})=>{
+        Posts.findCommentById(comment_id)
+        .then(([comment])=>{
+            if(comment){
+                res.status(200).json(comment)
+            }else{
+                res.status(404).json({message: 'This does not exist'})
+            }
+        })
+    }).catch(err => {
+        res.status(500).json({message: "There was an error while saving to the database"})
+    })
+})
 
 
 
