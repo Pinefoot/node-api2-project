@@ -69,18 +69,21 @@ router.delete('/:id', (req, res)=>{
 
 
 router.put('/:id', (req, res)=>{
-    const {title, contents} = req.body
-    if(!title || !contents){
-        return res.status(400).json({message: 'Please provide title and content!'})
-    }
+    const changes ={ ...req.body, title, content }
+    
 
-    Posts.update(({title, contents}))
-    .then(({id})=>{
-        Posts.findById(id)
-        .then(([post]))
-        res.status(201).json(post)
-    }).catch(err =>{
-        es.status(500).json({message: 'Error adding the post data'})
+    Posts.update(req.params.id, changes)
+    .then(update =>{
+        if(update){
+        res.status(200).json(update)
+    }else{
+        res.status(404).json({message: 'The error is the error that i need to update to be the correct error.'})
+    }
+    }).catch(error =>{
+        console.log(error);
+        res.status(500).json({
+            message: 'There was an error while saving to the database.'
+        })
     })
 })
 
