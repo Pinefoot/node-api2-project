@@ -15,8 +15,8 @@ router.get('/', (req,res)=>{
 
 router.get('/:id', (req,res)=>{
     Posts.findById(req.params.id)
-    .then(data =>{
-        if(!data.id){
+    .then(([data]) =>{
+        if(data){
             res.status(200).json(data)
             
         }else{
