@@ -69,15 +69,16 @@ router.delete('/:id', (req, res)=>{
 
 
 router.put('/:id', (req, res)=>{
-    const changes ={ ...req.body, title, content }
+    const changes = req.body
     
 
     Posts.update(req.params.id, changes)
     .then(update =>{
-        if(update){
-        res.status(200).json(update)
+        if(!req.body.title || !req.body.contents){
+            res.status(404).json({message: 'The error is the error that i need to update to be the correct error.'})
     }else{
-        res.status(404).json({message: 'The error is the error that i need to update to be the correct error.'})
+        
+        res.status(200).json(update)
     }
     }).catch(error =>{
         console.log(error);
